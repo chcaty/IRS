@@ -22,7 +22,11 @@ namespace IRS.ConsoleApp
             User B = new User("B", 3);
             User C = new User("C", 1);
             User D = new User("D", 2);
-        
+            User A1 = new User("A1", 3);
+            User B1 = new User("B1", 2);
+            User C1 = new User("C1", 4);
+            User D1 = new User("D1", 1);
+
             DutyTime time1 = new DutyTime("1");
             DutyTime time2 = new DutyTime("2");
             DutyTime time3 = new DutyTime("3");
@@ -40,6 +44,17 @@ namespace IRS.ConsoleApp
             time4.GetFreeUsers().Add(D);
             time5.GetFreeUsers().Add(D);
 
+            time1.GetFreeUsers().Add(A1);
+            time2.GetFreeUsers().Add(A1);
+            time4.GetFreeUsers().Add(A1);
+            time5.GetFreeUsers().Add(B1);
+            time1.GetFreeUsers().Add(B1);
+            time2.GetFreeUsers().Add(C1);
+            time3.GetFreeUsers().Add(C1);
+            time3.GetFreeUsers().Add(C1);
+            time4.GetFreeUsers().Add(C1);
+            time5.GetFreeUsers().Add(D1);
+
             List<DutyTime> dutyTimeList = new List<DutyTime>();
             dutyTimeList.Add(time1);
             dutyTimeList.Add(time2);
@@ -47,7 +62,7 @@ namespace IRS.ConsoleApp
             dutyTimeList.Add(time4);
             dutyTimeList.Add(time5);
 
-            for(int w = 0; w < 3; w++)
+            for (int w = 0; w < 3; w++)
             {
                 // 排序，可用于值班的人数少的值班段排在前面，下面安排值班是可用于值班的人数少的值班段优先安排  
                 dutyTimeList = dutyTimeSort(dutyTimeList);
@@ -56,22 +71,44 @@ namespace IRS.ConsoleApp
                     if(dutyTimeList[i].GetFreeUsers().Count > 0)
                     {
                         List<User> freeUserList = freeUserSort(dutyTimeList[i].GetFreeUsers());
-
                         dutyTimeList[i].GetDutyUsers().Add(freeUserList[0]);
-                        Console.WriteLine(freeUserList[0].GetName() + " 被安排到" + dutyTimeList[i].GetTime() + "值班；该值班段现有" + dutyTimeList[i].GetDutyUsers().Count + "人值班，" + freeUserList[0].GetName() + "一周总无课次数为：" + freeUserList[0].GetNum());
+                        Console.WriteLine(freeUserList[0].GetName() + " 被安排到" + dutyTimeList[i].GetTime() +
+                            "值班；该值班段现有" + dutyTimeList[i].GetDutyUsers().Count + "人值班，" + freeUserList[0].GetName() +
+                            "一周总无课次数为：" + freeUserList[0].GetNum());
+                        if (dutyTimeList[i].GetFreeUsers().Count > 1)
+                        {
+                            dutyTimeList[i].GetDutyUsers().Add(freeUserList[1]);
+                            Console.WriteLine(freeUserList[1].GetName() + " 被安排到" + dutyTimeList[i].GetTime() +
+                                "值班；该值班段现有" + dutyTimeList[i].GetDutyUsers().Count + "人值班，" + freeUserList[1].GetName() +
+                                "一周总无课次数为：" + freeUserList[1].GetNum());
+                        }
 
                         User delUser = freeUserList[0];
-                        for(int j = 0; j<dutyTimeList.Count(); j++)
+                        
+                        //if (dutyTimeList[i].GetFreeUsers().Contains(delUser))
+                        //{
+                        //    dutyTimeList[i].GetFreeUsers().Remove(delUser);
+                        //    Console.WriteLine("---" + delUser.GetName() + "已从" + dutyTimeList[i].GetTime() +
+                        //        "值班段删除，目前该值班段剩余未被安排人数有：" + dutyTimeList[i].GetFreeUsers().Count);
+                        //}
+                        for (int j = 0; j < dutyTimeList.Count(); j++)
                         {
-                            if(dutyTimeList[j].GetFreeUsers().Contains(delUser))
+                            if (dutyTimeList[j].GetFreeUsers().Contains(delUser))
                             {
                                 dutyTimeList[j].GetFreeUsers().Remove(delUser);
-                                Console.WriteLine("---" + delUser.GetName() + "已从" + dutyTimeList[j).getTime() + "值班段删除，目前该值班段剩余未被安排人数有：" + dutyTimeList.get(j).getFreeUsers().size());
+                                Console.WriteLine("---" + delUser.GetName() + "已从" + dutyTimeList[j].GetTime() +
+                                    "值班段删除，目前该值班段剩余未被安排人数有：" + dutyTimeList[j].GetFreeUsers().Count);
                             }
                         }
                     }
+                    else
+                    {
+                        Console.WriteLine(dutyTimeList[i].GetTime() + "该值班段已无人可安排值班");
+                    }
                 }
+                Console.WriteLine("---------------------安排了一轮--------------------");
             }
+            Console.Read();
         }
 
         public static List<User> freeUserSort(List<User> freeUserList)
