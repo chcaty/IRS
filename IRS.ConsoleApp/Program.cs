@@ -7,158 +7,89 @@ namespace IRS.ConsoleApp
 {
     class Program
     {
+        /*
+         *  值班安排： 
+         *  先为每个值班段安排一名人员值班（第一轮），安排一轮后再进行第二轮、第三轮
+         *  按优先级安排值班： 
+         *  1.各个值班段可值班人员数少的优先安排值班
+         *  2.在一个值班段选择人员时，优先选择总无课次数少的人
+         *  注：人员在被安排后就会从该值班段中的无课人员集合中删除，这样之后就不用再遍历到；在一轮安排后开始下一轮时，每个值班段的排人顺序会重新调整（因为去掉了已被安排的人） 
+         *  
+         */ 
         static void Main()
         {
-            // 创建约束求解器.
-            var solver = new Solver("schedule_shifts");
-            var num_nurses = 4;
-            var num_shifts = 4;  // 班次数定为4，这样序号为0的班次表示是休息的班。
-            var num_days = 7;
+            User A = new User("A", 4);
+            User B = new User("B", 3);
+            User C = new User("C", 1);
+            User D = new User("D", 2);
+        
+            DutyTime time1 = new DutyTime("1");
+            DutyTime time2 = new DutyTime("2");
+            DutyTime time3 = new DutyTime("3");
+            DutyTime time4 = new DutyTime("4");
+            DutyTime time5 = new DutyTime("5");
 
-            // [START]
-            // 创建班次变量
-            var shifts = new Dictionary<(int, int), IntVar>();
+            time1.GetFreeUsers().Add(A);
+            time2.GetFreeUsers().Add(A);
+            time4.GetFreeUsers().Add(A);
+            time5.GetFreeUsers().Add(A);
+            time1.GetFreeUsers().Add(B);
+            time2.GetFreeUsers().Add(B);
+            time3.GetFreeUsers().Add(B);
+            time3.GetFreeUsers().Add(C);
+            time4.GetFreeUsers().Add(D);
+            time5.GetFreeUsers().Add(D);
 
-            foreach (var j in Enumerable.Range(0, num_nurses))
+            List<DutyTime> dutyTimeList = new List<DutyTime>();
+            dutyTimeList.Add(time1);
+            dutyTimeList.Add(time2);
+            dutyTimeList.Add(time3);
+            dutyTimeList.Add(time4);
+            dutyTimeList.Add(time5);
+
+            for(int w = 0; w < 3; w++)
             {
-                foreach (var i in Enumerable.Range(0, num_days))
+                // 排序，可用于值班的人数少的值班段排在前面，下面安排值班是可用于值班的人数少的值班段优先安排  
+                dutyTimeList = dutyTimeSort(dutyTimeList);
+                for(int i =0; i<dutyTimeList.Count;i++)
                 {
-                    // shifts[(j, i)]表示护士j在第i天的班次，可能的班次的编号范围是:[0, num_shifts)
-                    shifts[(j, i)] = solver.MakeIntVar(0, num_shifts - 1, string.Format("shifts({0},{1})", j, i));
-                }
-            }
-
-            // 将变量集合转成扁平化数组
-            var shifts_flat = (from j in Enumerable.Range(0, num_nurses)
-                               from i in Enumerable.Range(0, num_days)
-                               select shifts[(j, i)]).ToArray();
-
-            // 创建护士变量
-            var nurses = new Dictionary<(int, int), IntVar>();
-
-            foreach (var j in Enumerable.Range(0, num_shifts))
-            {
-                foreach (var i in Enumerable.Range(0, num_days))
-                {
-                    // nurses[(j, i)]表示班次j在第i天的当班护士，可能的护士的编号范围是:[0, num_nurses)
-                    nurses[(j, i)] = solver.MakeIntVar(0, num_nurses - 1, string.Format("shift{0} day{1}", j, i));
-                }
-            }
-
-            // 定义shifts和nurses之前的关联关系
-            foreach (var day in Enumerable.Range(0, num_days))
-            {
-                var nurses_for_day = (from j in Enumerable.Range(0, num_shifts)
-                                      select nurses[(j, day)]).ToArray();
-                foreach (var j in Enumerable.Range(0, num_nurses))
-                {
-                    var s = shifts[(j, day)];
-                    // s.IndexOf(nurses_for_day)相当于nurses_for_day[s]
-                    // 这里利用了s的值恰好是在nurses_for_day中对应nurse的编号
-                    solver.Add(s.IndexOf(nurses_for_day) == j);
-                }
-            }
-
-            // 满足每一天的当班护士不重复，每一天的班次不会出现重复的护士的约束条件
-            // 同样每一个护士每天不可能同时轮值不同的班次
-            foreach (var i in Enumerable.Range(0, num_days))
-            {
-                solver.Add((from j in Enumerable.Range(0, num_nurses)
-                            select shifts[(j, i)]).ToArray().AllDifferent());
-                solver.Add((from j in Enumerable.Range(0, num_shifts)
-                            select nurses[(j, i)]).ToArray().AllDifferent());
-            }
-
-            // 满足每个护士在一周范围内只出现[5, 6]次
-            foreach (var j in Enumerable.Range(0, num_nurses))
-            {
-                solver.Add((from i in Enumerable.Range(0, num_days)
-                            select shifts[(j, i)] > 0).ToArray().Sum() >= 5);
-                solver.Add((from i in Enumerable.Range(0, num_days)
-                            select shifts[(j, i)] > 0).ToArray().Sum() <= 6);
-            }
-
-            // 创建一个工作的变量，works_shift[(i, j)]为True表示护士i在班次j一周内至少要有1次
-            // BoolVar类型的变量最终取值是0或1，同样也表示了False或True
-            var works_shift = new Dictionary<(int, int), IntVar>();
-
-            foreach (var i in Enumerable.Range(0, num_nurses))
-            {
-                foreach (var j in Enumerable.Range(0, num_shifts))
-                {
-                    works_shift[(i, j)] = solver.MakeBoolVar(string.Format("nurse%d shift%d", i, j));
-                }
-            }
-
-            foreach (var i in Enumerable.Range(0, num_nurses))
-            {
-                foreach (var j in Enumerable.Range(0, num_shifts))
-                {
-                    // 建立works_shift与shifts的关联关系
-                    // 一周内的值要么为0要么为1，所以Max定义的约束是最大值，恰好也是0或1，1表示至少在每周轮班一天
-                    solver.Add(works_shift[(i, j)] == (from k in Enumerable.Range(0, num_days)
-                                                       select shifts[(i, k)].IsEqual(j)).ToArray().Max());
-                }
-            }
-
-            // 对于每个编号不为0的shift, 满足至少每周最多同一个班次2个护士当班
-            foreach (var j in Enumerable.Range(1, num_shifts - 1))
-            {
-                solver.Add((from i in Enumerable.Range(0, num_nurses)
-                            select works_shift[(i, j)]).ToArray().Sum() <= 2);
-            }
-
-            // 满足中班或晚班的护士前一天或后一天也是相同的班次
-            // 用nurses的key中Tuple类型第1个item的值表示shift为2或3
-            // shift为1表示早班班次，shift为0表示休息的班次
-            solver.Add(solver.MakeMax(nurses[(2, 0)] == nurses[(2, 1)], nurses[(2, 1)] == nurses[(2, 2)]) == 1);
-            solver.Add(solver.MakeMax(nurses[(2, 1)] == nurses[(2, 2)], nurses[(2, 2)] == nurses[(2, 3)]) == 1);
-            solver.Add(solver.MakeMax(nurses[(2, 2)] == nurses[(2, 3)], nurses[(2, 3)] == nurses[(2, 4)]) == 1);
-            solver.Add(solver.MakeMax(nurses[(2, 3)] == nurses[(2, 4)], nurses[(2, 4)] == nurses[(2, 5)]) == 1);
-            solver.Add(solver.MakeMax(nurses[(2, 4)] == nurses[(2, 5)], nurses[(2, 5)] == nurses[(2, 6)]) == 1);
-            solver.Add(solver.MakeMax(nurses[(2, 5)] == nurses[(2, 6)], nurses[(2, 6)] == nurses[(2, 0)]) == 1);
-            solver.Add(solver.MakeMax(nurses[(2, 6)] == nurses[(2, 0)], nurses[(2, 0)] == nurses[(2, 1)]) == 1);
-
-            solver.Add(solver.MakeMax(nurses[(3, 0)] == nurses[(3, 1)], nurses[(3, 1)] == nurses[(3, 2)]) == 1);
-            solver.Add(solver.MakeMax(nurses[(3, 1)] == nurses[(3, 2)], nurses[(3, 2)] == nurses[(3, 3)]) == 1);
-            solver.Add(solver.MakeMax(nurses[(3, 2)] == nurses[(3, 3)], nurses[(3, 3)] == nurses[(3, 4)]) == 1);
-            solver.Add(solver.MakeMax(nurses[(3, 3)] == nurses[(3, 4)], nurses[(3, 4)] == nurses[(3, 5)]) == 1);
-            solver.Add(solver.MakeMax(nurses[(3, 4)] == nurses[(3, 5)], nurses[(3, 5)] == nurses[(3, 6)]) == 1);
-            solver.Add(solver.MakeMax(nurses[(3, 5)] == nurses[(3, 6)], nurses[(3, 6)] == nurses[(3, 0)]) == 1);
-            solver.Add(solver.MakeMax(nurses[(3, 6)] == nurses[(3, 0)], nurses[(3, 0)] == nurses[(3, 1)]) == 1);
-
-            // 将变量集合设置为求解的目标，Solver有一系列的枚举值，可以指定求解的选择策略。
-            var db = solver.MakePhase(shifts_flat, Solver.CHOOSE_FIRST_UNBOUND, Solver.ASSIGN_MIN_VALUE);
-
-
-            // 创建求解的对象
-            var solution = solver.MakeAssignment();
-            solution.Add(shifts_flat);
-            var collector = solver.MakeAllSolutionCollector(solution);
-
-            solver.Solve(db, new[] { collector });
-            Console.WriteLine("Solutions found: {0}", collector.SolutionCount());
-            Console.WriteLine("Time: {0}ms", solver.WallTime());
-            Console.WriteLine();
-
-            // 显示一些随机的结果
-            var a_few_solutions = new[] { 340, 2672, 7054, 1024 };
-
-            foreach (var sol in a_few_solutions)
-            {
-                Console.WriteLine("Solution number {0}", sol);
-
-                foreach (var i in Enumerable.Range(0, num_days))
-                {
-                    Console.WriteLine("Day {0}", i);
-                    foreach (var j in Enumerable.Range(0, num_nurses))
+                    if(dutyTimeList[i].GetFreeUsers().Count > 0)
                     {
-                        Console.WriteLine("Nurse {0} assigned to task {1}", j, collector.Value(sol, shifts[(j, i)]));
+                        List<User> freeUserList = freeUserSort(dutyTimeList[i].GetFreeUsers());
+
+                        dutyTimeList[i].GetDutyUsers().Add(freeUserList[0]);
+                        Console.WriteLine(freeUserList[0].GetName() + " 被安排到" + dutyTimeList[i].GetTime() + "值班；该值班段现有" + dutyTimeList[i].GetDutyUsers().Count + "人值班，" + freeUserList[0].GetName() + "一周总无课次数为：" + freeUserList[0].GetNum());
+
+                        User delUser = freeUserList[0];
+                        for(int j = 0; j<dutyTimeList.Count(); j++)
+                        {
+                            if(dutyTimeList[j].GetFreeUsers().Contains(delUser))
+                            {
+                                dutyTimeList[j].GetFreeUsers().Remove(delUser);
+                                Console.WriteLine("---" + delUser.GetName() + "已从" + dutyTimeList[j).getTime() + "值班段删除，目前该值班段剩余未被安排人数有：" + dutyTimeList.get(j).getFreeUsers().size());
+                            }
+                        }
                     }
-                    Console.WriteLine();
                 }
             }
-            Console.ReadKey();
+        }
+
+        public static List<User> freeUserSort(List<User> freeUserList)
+        {
+            freeUserList.Sort(delegate (User x, User y)
+            {
+                return x.GetNum().CompareTo(y.GetNum());
+            });
+            return freeUserList;
+        }
+
+        public static List<DutyTime> dutyTimeSort(List<DutyTime> dutyTimeList)
+        {
+            dutyTimeList.Sort(delegate (DutyTime x, DutyTime y)
+            {
+                return x.GetFreeUsers().Count.CompareTo(y.GetFreeUsers().Count);
+            });
+            return dutyTimeList;
         }
     }
 }
