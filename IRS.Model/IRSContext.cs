@@ -11,5 +11,13 @@ namespace IRS.Model
     {
         public IRSContext() : base() { }
         public IRSContext(DbContextOptions options) : base(options) { }
+
+        public DbSet<Record> Records { get; set; }
+        public DbSet<Permission> Actions { get; set; }
+        public DbSet<ProcessingRecord> ProcessingRecords { get; set; }
+        public DbSet<RolePermission> RoleAction { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<UserRole> UserRole { get; set; }
+        public DbSet<User> Users { get; set; }
     }
 }

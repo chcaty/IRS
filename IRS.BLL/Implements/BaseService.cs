@@ -14,6 +14,7 @@ namespace IRS.BLL.Implements
         {
             _baseDal = baseDal;
         }
+
         public IQueryable<T> LoadEntities(System.Linq.Expressions.Expression<Func<T, bool>> whereLambda)
         {
             return _baseDal.LoadEntities(whereLambda);

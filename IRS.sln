@@ -3,10 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "IRS.Test", "IRS.Test", "{D81135AE-FFBF-4EFB-B707-24B5D1C3F165}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IRS.ConsoleApp", "IRS.ConsoleApp\IRS.ConsoleApp.csproj", "{2AA8C4A0-E638-4AA9-A432-AF3A64D2A225}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IRS.BLL", "IRS.BLL\IRS.BLL.csproj", "{4EDBF26E-CF0F-4E96-A257-378CE65C6FE6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IRS.Dal", "IRS.Dal\IRS.Dal.csproj", "{E977E2F3-CA5E-4DE6-BF13-1ED1FDF3167B}"
@@ -15,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IRS.Common", "IRS.Common\IR
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IRS.Model", "IRS.Model\IRS.Model.csproj", "{732A8D80-E0A5-4DC0-B81B-F83F1FBCC6E1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IRS.Web", "IRS.Web\IRS.Web.csproj", "{60104BF3-AD33-4AB8-AB26-9FA1CE531426}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IRS.Web", "IRS.Web\IRS.Web.csproj", "{60104BF3-AD33-4AB8-AB26-9FA1CE531426}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +19,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{2AA8C4A0-E638-4AA9-A432-AF3A64D2A225}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2AA8C4A0-E638-4AA9-A432-AF3A64D2A225}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2AA8C4A0-E638-4AA9-A432-AF3A64D2A225}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2AA8C4A0-E638-4AA9-A432-AF3A64D2A225}.Release|Any CPU.Build.0 = Release|Any CPU
 		{4EDBF26E-CF0F-4E96-A257-378CE65C6FE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{4EDBF26E-CF0F-4E96-A257-378CE65C6FE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4EDBF26E-CF0F-4E96-A257-378CE65C6FE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -50,9 +42,6 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{2AA8C4A0-E638-4AA9-A432-AF3A64D2A225} = {D81135AE-FFBF-4EFB-B707-24B5D1C3F165}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C9D3B024-581B-4E2B-A651-1033FC4EAC02}
