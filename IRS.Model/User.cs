@@ -11,7 +11,8 @@ namespace IRS.Model
         public string UserPwd { get; set; }
         public string UserName { get; set; }
         public bool IsEnable { get; set; }
-        public string validity { get; set; }
-        public int isDeleted { get; set; }
+        public string Validity { get; set; }
+        public int RoleId { get; set; }
+        public int IsDeleted { get; set; }
     }
 }

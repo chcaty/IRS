@@ -17,10 +17,6 @@ namespace IRS.BLL.Interface
     {
 
     }
-    public partial interface IUserRoleService : IBaseService<UserRole>
-    {
-
-    }
     public partial interface IRolePermissionService : IBaseService<RolePermission>
     {
 
@@ -30,10 +26,6 @@ namespace IRS.BLL.Interface
 
     }
     public partial interface IProcessingRecordService : IBaseService<ProcessingRecord>
-    {
-
-    }
-    public partial interface IUserRoleService : IBaseService<UserRole>
     {
 
     }

@@ -27,13 +27,6 @@ namespace IRS.Dal.Implements
 
         }
     }
-    public partial class UserRoleDal : BaseDal<UserRole>, IUserRoleDal
-    {
-        public UserRoleDal(IRSContext dbContext) : base(dbContext)
-        {
-
-        }
-    }
     public partial class RolePermissionDal : BaseDal<RolePermission>, IRolePermissionDal
     {
         public RolePermissionDal(IRSContext dbContext) : base(dbContext)

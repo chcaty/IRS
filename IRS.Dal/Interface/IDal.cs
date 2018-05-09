@@ -17,10 +17,6 @@ namespace IRS.Dal.Interface
     {
 
     }
-    public partial interface IUserRoleDal : IBaseDal<UserRole>
-    {
-
-    }
     public partial interface IRolePermissionDal : IBaseDal<RolePermission>
     {
 

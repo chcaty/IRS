@@ -34,15 +34,6 @@ namespace IRS.BLL.Implements
         }
     }
 
-    public partial class UserRoleService : BaseService<UserRole>, IUserRoleService
-    {
-        private IUserRoleDal _userroleDal;
-        public UserRoleService(IUserRoleDal userroleDal) : base(userroleDal)
-        {
-            _userroleDal = userroleDal;
-        }
-    }
-
     public partial class RolePermissionService : BaseService<RolePermission>, IRolePermissionService
     {
         private IRolePermissionDal _rolepermissionDal;

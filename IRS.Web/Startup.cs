@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IRS.BLL.Implements;
+using IRS.BLL.Interface;
+using IRS.Dal.Implements;
+using IRS.Dal.Interface;
 using IRS.Model;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -30,15 +34,14 @@ namespace IRS.Web
             services.AddDbContext<IRSContext>(options => options.UseSqlServer(connection));
             services.AddScoped<DbContext, IRSContext>();
             services.AddMvc();
+            services.AddSession();
 
             #region 依赖注入
-            //services.AddScoped<IFaceDal, FaceDal>();
-            //services.AddScoped<IPeopleDal, PeopleDal>();
-            //services.AddScoped<IGroupDal, GroupDal>();
+            services.AddScoped<IUserDal, UserDal>();
+            services.AddScoped<IRoleDal, RoleDal>();
             //services.AddScoped<IPeopleGroupDal, PeopleGroupDal>();
-            //services.AddScoped<IFaceService, FaceService>();
-            //services.AddScoped<IPeopleService, PeopleService>();
-            //services.AddScoped<IGroupService, GroupService>();
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoleService, RoleService>();
             //services.AddScoped<IPeopleGroupService, PeopleGroupService>();
             #endregion
         }
@@ -59,6 +62,7 @@ namespace IRS.Web
             });
 
             app.UseMvc();
+            app.UseSession();
         }
     }
 }

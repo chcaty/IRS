@@ -12,5 +12,6 @@ namespace IRS.Model
         public string ProcessingDesc { get; set; }
         public string ProcessingTime { get; set; }
         public int ProcessingResult { get; set; }
+        public int UserId { get; set; }
     }
 }
