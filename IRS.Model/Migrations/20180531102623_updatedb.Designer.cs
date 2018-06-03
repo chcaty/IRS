@@ -11,9 +11,10 @@ using System;
 namespace IRS.Model.Migrations
 {
     [DbContext(typeof(IRSContext))]
-    partial class IRSContextModelSnapshot : ModelSnapshot
+    [Migration("20180531102623_updatedb")]
+    partial class updatedb
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

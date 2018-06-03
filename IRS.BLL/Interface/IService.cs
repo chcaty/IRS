@@ -29,4 +29,9 @@ namespace IRS.BLL.Interface
     {
 
     }
+
+    public partial interface ICategoryInfoService : IBaseService<CategoryInfo>
+    {
+
+    }
 }

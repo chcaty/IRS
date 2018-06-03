@@ -11,9 +11,10 @@ using System;
 namespace IRS.Model.Migrations
 {
     [DbContext(typeof(IRSContext))]
-    partial class IRSContextModelSnapshot : ModelSnapshot
+    [Migration("20180530020903_RecordTableUpdateRecordTime")]
+    partial class RecordTableUpdateRecordTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,10 +33,6 @@ namespace IRS.Model.Migrations
                     b.Property<int>("CategoryInfoOrder");
 
                     b.Property<int>("CategoryInfoType");
-
-                    b.Property<int>("EndFlag");
-
-                    b.Property<int>("StartFlag");
 
                     b.HasKey("CategoryInfoId");
 
@@ -65,7 +62,7 @@ namespace IRS.Model.Migrations
 
                     b.Property<string>("ProcessingDesc");
 
-                    b.Property<string>("ProcessingPeople");
+                    b.Property<int>("ProcessingPeople");
 
                     b.Property<int>("ProcessingResult");
 
@@ -112,8 +109,6 @@ namespace IRS.Model.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<int>("IsDeleted");
-
-                    b.Property<string>("RoleDecs");
 
                     b.Property<string>("RoleName");
 

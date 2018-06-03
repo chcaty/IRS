@@ -10,7 +10,7 @@ namespace IRS.Model
         public string UserCode { get; set; }
         public string UserPwd { get; set; }
         public string UserName { get; set; }
-        public bool IsEnable { get; set; }
+        public int IsEnable { get; set; }
         public string Validity { get; set; }
         public int RoleId { get; set; }
         public int IsDeleted { get; set; }

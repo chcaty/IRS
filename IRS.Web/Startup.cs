@@ -30,19 +30,34 @@ namespace IRS.Web
         public void ConfigureServices(IServiceCollection services)
         {
             //添加ef的依赖  
-            var connection = "server=.;uid=sa;pwd=123;database=IRSDb";
-            services.AddDbContext<IRSContext>(options => options.UseSqlServer(connection));
+            var connection = Configuration.GetConnectionString("SqlServer");
+            //var connection = "server=.;uid=sa;pwd=123;database=IRSDb";
+            services.AddDbContext<IRSContext>(options => options.UseSqlServer(connection, b => b.UseRowNumberForPaging()));
             services.AddScoped<DbContext, IRSContext>();
             services.AddMvc();
-            services.AddSession();
+            //services.AddSession();
 
             #region 依赖注入
             services.AddScoped<IUserDal, UserDal>();
             services.AddScoped<IRoleDal, RoleDal>();
+            services.AddScoped<IPermissionDal, PermissionDal>();
+            services.AddScoped<IRolePermissionDal, RolePermissionDal>();
+            services.AddScoped<ICategoryInfoDal, CategoryInfoDal>();
+            services.AddScoped<IRecordDal, RecordDal>();
+            services.AddScoped<IProcessingRecordDal, ProcessingRecordDal>();
             //services.AddScoped<IPeopleGroupDal, PeopleGroupDal>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<IPermissionService, PermissionService>();
+            services.AddScoped<IRolePermissionService, RolePermissionService>();
+            services.AddScoped<ICategoryInfoService, CategoryInfoService>();
+            services.AddScoped<IRecordService, RecordService>();
+            services.AddScoped<IProcessingRecordService, ProcessingRecordService>();
             //services.AddScoped<IPeopleGroupService, PeopleGroupService>();
+            #endregion
+
+            #region 跨域
+            services.AddCors(options => options.AddPolicy("Domain", builder => builder.AllowAnyMethod().AllowAnyHeader().AllowAnyOrigin().AllowCredentials()));
             #endregion
         }
 
@@ -54,15 +69,12 @@ namespace IRS.Web
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseCors(builder =>
-            {
-                builder.AllowAnyHeader();
-                builder.AllowAnyMethod();
-                builder.AllowAnyOrigin();
-            });
+            app.UseCors("Domain");
+
+            //app.UseCors(builder => builder.WithOrigins("http://localhost"));
 
             app.UseMvc();
-            app.UseSession();
+            //app.UseSession();
         }
     }
 }

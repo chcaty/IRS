@@ -8,7 +8,7 @@ namespace IRS.Model
     {
         public int ProcessingRecordId { get; set; }
         public int RecordId { get; set; }
-        public int ProcessingPeople { get; set; }
+        public string ProcessingPeople { get; set; }
         public string ProcessingDesc { get; set; }
         public string ProcessingTime { get; set; }
         public int ProcessingResult { get; set; }

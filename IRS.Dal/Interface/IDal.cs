@@ -29,4 +29,9 @@ namespace IRS.Dal.Interface
     {
 
     }
+
+    public partial interface ICategoryInfoDal : IBaseDal<CategoryInfo>
+    {
+
+    }
 }

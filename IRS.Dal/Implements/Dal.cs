@@ -49,4 +49,12 @@ namespace IRS.Dal.Implements
 
         }
     }
+
+    public partial class CategoryInfoDal : BaseDal<CategoryInfo>, ICategoryInfoDal
+    {
+        public CategoryInfoDal(IRSContext dbContext) : base(dbContext)
+        {
+
+        }
+    }
 }

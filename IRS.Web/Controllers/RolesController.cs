@@ -10,8 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace IRS.Web.Controllers
 {
     [Produces("application/json")]
-    [Route("api/Roles")]
-    public class RolesController : BaseController
+    [Route("api/role")]
+    public class RolesController : Controller
     {
         private IRoleService _roleService;
         public RolesController(IRoleService roleService)
@@ -22,48 +22,67 @@ namespace IRS.Web.Controllers
         [HttpGet]
         public ActionResult GetRoles()
         {
-            var roleList = _roleService.LoadEntities(r => true);
-            return Json(roleList);
+            var addresslist = _roleService.LoadEntities(r => true);
+            return Json(new
+            {
+                data = addresslist
+            });
+        }
+
+        [HttpGet("{id}")]
+        public ActionResult GetRole(int id)
+        {
+            var address = _roleService.LoadEntities(r => r.RoleId == id).FirstOrDefault();
+            return Json(new
+            {
+                data = address
+            });
         }
 
         [HttpPost]
-        public ActionResult AddRole([FromBody]Role role)
+        public ActionResult AddRole([FromBody] Role role)
         {
             var result = _roleService.AddEntity(role);
-            return Content("ok");
+            return Json(new
+            {
+                status_code = 200
+            });
         }
 
-        public ActionResult EditRole([FromBody]Role role)
+        [HttpPut("{id}")]
+        public ActionResult EditRole(int id, [FromBody] Role role)
         {
-            var result = _roleService.EditEntity(role);
-            if (result)
+            var result = _roleService.LoadEntities(r => r.RoleId== id).FirstOrDefault();
+            if (result != null && result != role)
             {
-                return Content("ok");
+                result.RoleName = role.RoleName;
+                result.RoleDecs = role.RoleDecs;
+                if (_roleService.EditEntity(result))
+                {
+                    return Json(new
+                    {
+                        status_code = 200
+                    });
+                }
             }
-            else
-            {
-                return Content("no");
-            }
+            return Content("no");
         }
 
-        public ActionResult DelRole(int id)
+        [HttpDelete("{id}")]
+        public ActionResult DeleteRole(int id)
         {
-            var role = _roleService.LoadEntities(r => r.RoleId == id).First();
-            var result = _roleService.DeleteEntity(role);
-            if (result)
+            var result = _roleService.LoadEntities(r => r.RoleId == id).FirstOrDefault();
+            if (result != null)
             {
-                return Content("ok");
+                if (_roleService.DeleteEntity(result))
+                {
+                    return Json(new
+                    {
+                        status_code = 200
+                    });
+                }
             }
-            else
-            {
-                return Content("no");
-            }
-        }
-
-        public ActionResult GetRole(int id)
-        {
-            var role = _roleService.LoadEntities(r => r.RoleId == id).First();
-            return Json(role);
+            return Content("no");
         }
     }
 }

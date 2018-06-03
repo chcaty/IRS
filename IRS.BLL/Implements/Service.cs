@@ -60,4 +60,13 @@ namespace IRS.BLL.Implements
             _processingrecordDal = processingrecordDal;
         }
     }
+
+    public partial class CategoryInfoService:BaseService<CategoryInfo>,ICategoryInfoService
+    {
+        private ICategoryInfoDal _categoryInfoDal;
+        public CategoryInfoService(ICategoryInfoDal categoryInfoDal):base(categoryInfoDal)
+        {
+            _categoryInfoDal = categoryInfoDal;
+        }
+    }
 }
