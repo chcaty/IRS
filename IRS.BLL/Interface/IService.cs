@@ -19,7 +19,7 @@ namespace IRS.BLL.Interface
     }
     public partial interface IRolePermissionService : IBaseService<RolePermission>
     {
-
+        bool DeleteEntityById(int id);
     }
     public partial interface IRecordService : IBaseService<Record>
     {

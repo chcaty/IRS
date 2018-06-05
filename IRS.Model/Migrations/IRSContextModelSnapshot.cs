@@ -49,9 +49,15 @@ namespace IRS.Model.Migrations
 
                     b.Property<int>("IsDeleted");
 
-                    b.Property<string>("PermissionCode");
+                    b.Property<string>("PermissionApi");
+
+                    b.Property<string>("PermissionDecs");
 
                     b.Property<string>("PermissionName");
+
+                    b.Property<string>("PermissionRoute");
+
+                    b.Property<int>("parentId");
 
                     b.HasKey("PermissionId");
 

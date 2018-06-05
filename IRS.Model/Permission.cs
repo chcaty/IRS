@@ -8,7 +8,10 @@ namespace IRS.Model
     {
         public int PermissionId { get; set; }
         public string PermissionName { get; set; }
-        public string PermissionCode { get; set; }
+        public string PermissionRoute { get; set; }
+        public string PermissionApi{get;set;}
+        public string PermissionDecs { get; set; }
+        public int parentId { get; set; }
         public int IsDeleted { get; set; }
     }
 }

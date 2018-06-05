@@ -41,6 +41,16 @@ namespace IRS.BLL.Implements
         {
             _rolepermissionDal = rolepermissionDal;
         }
+
+        public bool DeleteEntityById(int id)
+        {
+            var list = _rolepermissionDal.LoadEntities(p => p.RolesId == id);
+            foreach (var i in list)
+            {
+                _rolepermissionDal.DeleteEntity(i);
+            }
+            return _rolepermissionDal.SaveChanges();
+        }
     }
 
     public partial class RecordService : BaseService<Record>, IRecordService
@@ -59,6 +69,7 @@ namespace IRS.BLL.Implements
         {
             _processingrecordDal = processingrecordDal;
         }
+        
     }
 
     public partial class CategoryInfoService:BaseService<CategoryInfo>,ICategoryInfoService

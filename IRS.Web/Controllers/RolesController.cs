@@ -14,18 +14,22 @@ namespace IRS.Web.Controllers
     public class RolesController : Controller
     {
         private IRoleService _roleService;
-        public RolesController(IRoleService roleService)
+        private IPermissionService _permissionService;
+        private IRolePermissionService _rolePermissionService;
+        public RolesController(IRoleService roleService, IPermissionService permissionService, IRolePermissionService rolePermissionService)
         {
             _roleService = roleService;
+            _permissionService = permissionService;
+            _rolePermissionService = rolePermissionService;
         }
 
         [HttpGet]
         public ActionResult GetRoles()
         {
-            var addresslist = _roleService.LoadEntities(r => true);
+            var rolelist = _roleService.LoadEntities(r => true);
             return Json(new
             {
-                data = addresslist
+                data = rolelist
             });
         }
 
@@ -36,6 +40,37 @@ namespace IRS.Web.Controllers
             return Json(new
             {
                 data = address
+            });
+        }
+
+        [HttpGet("permission/{id}")]
+        public ActionResult GetPermission(int id)
+        {
+            var result = _rolePermissionService.LoadEntities(rp => rp.RolesId == id);
+            var perm = _permissionService.LoadEntities(p => true);
+            var permission = from r in result
+                             join p in perm on r.PermissionId equals p.PermissionId
+                             select new
+                             {
+                                 r.PermissionId
+                             };
+            return Json(new
+            {
+                data = permission,
+            });
+        }
+
+        [HttpPut("permission/{id}")]
+        public ActionResult EditPermission(int id, [FromBody]Model model)
+        {
+            _rolePermissionService.DeleteEntityById(id);
+            foreach (var i in model.Permission)
+            {
+                _rolePermissionService.AddEntity(new RolePermission { RolesId = id, PermissionId = Convert.ToInt32(i) });
+            }
+            return Json(new
+            {
+                status_code = 200
             });
         }
 
@@ -52,7 +87,7 @@ namespace IRS.Web.Controllers
         [HttpPut("{id}")]
         public ActionResult EditRole(int id, [FromBody] Role role)
         {
-            var result = _roleService.LoadEntities(r => r.RoleId== id).FirstOrDefault();
+            var result = _roleService.LoadEntities(r => r.RoleId == id).FirstOrDefault();
             if (result != null && result != role)
             {
                 result.RoleName = role.RoleName;
@@ -83,6 +118,11 @@ namespace IRS.Web.Controllers
                 }
             }
             return Content("no");
+        }
+
+        public class Model
+        {
+            public int[] Permission { get; set; }
         }
     }
 }

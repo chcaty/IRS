@@ -27,7 +27,7 @@ namespace IRS.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult GetAdmin(int page, int pageSize, string UserName, string UserCode)
+        public ActionResult GetAdmin( string UserName, string UserCode, int page = 1, int pageSize = 10)
         {
             int total = 0;
             var users = _userService.LoadPageEntities(page, pageSize, out total, u => true, u => u.Validity, false);

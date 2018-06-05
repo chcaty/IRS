@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using Microsoft.Extensions.Configuration;
+using System.Collections;
 
 namespace IRS.Web.Controllers
 {
@@ -22,10 +23,15 @@ namespace IRS.Web.Controllers
         private IUserService _userService;
         private IRoleService _roleService;
         private readonly IConfiguration _configuration;
-        public LoginController(IUserService userService, IConfiguration configuration)
+        private IRolePermissionService _rolePermissionService;
+        private IPermissionService _permissionService;
+        public LoginController(IUserService userService, IConfiguration configuration, IRoleService roleService,IRolePermissionService rolePermissionService, IPermissionService permissionService)
         {
             _configuration = configuration;
             _userService = userService;
+            _roleService = roleService;
+            _rolePermissionService = rolePermissionService;
+            _permissionService = permissionService;
         }
 
         [HttpPost]
@@ -44,15 +50,6 @@ namespace IRS.Web.Controllers
                     {
                         token,
                         expires_in,
-                        //data = new
-                        //{
-                        //    id = result.UserId,
-                        //    name = result.UserName,
-                        //    permission = new string[0], //{ "admin" },
-                        //    role = new string[1] { "admin" }
-                        //},
-                        //status = "sucess",
-                        //status_code = "200"
                     });
                 }
             }
@@ -66,17 +63,74 @@ namespace IRS.Web.Controllers
         }
 
         [HttpGet]
-        public ActionResult Index()
+        public ActionResult Index(string token)
         {
+            JwtSecurityTokenHandler jwt = new JwtSecurityTokenHandler();
+            var info = jwt.ReadJwtToken(token).Claims;
+            var usercode = info.Where(r => r.Type == ClaimTypes.Name).FirstOrDefault().Value;
+            var user = _userService.LoadEntities(u => u.UserCode == usercode);
+            var role = _roleService.LoadEntities(r => true);
+            var rolepermission = _rolePermissionService.LoadEntities(rp => true);
+            var permission = _permissionService.LoadEntities(p => true);
+            var result = from u in user
+                         join r in role on u.RoleId equals r.RoleId
+                         select new
+                         {
+                             u.UserId,
+                             u.UserCode,
+                             u.UserName,
+                             r.RoleName,
+                             r.RoleId
+                         };
+            var permissionlist = from r in result
+                        join rp in rolepermission on r.RoleId equals rp.RolesId into temp
+                        from tt in temp.DefaultIfEmpty()
+                        select new
+                        {
+                            tt.PermissionId
+                        };
+            var apilist = from r in permissionlist
+                       join p in permission on r.PermissionId equals p.PermissionId
+                       select new
+                       {
+                           route_match = p.PermissionApi
+                       };
+            var routelist = from r in permissionlist
+                          join p in permission on r.PermissionId equals p.PermissionId
+                          select new
+                          {
+                              p.PermissionRoute
+                          };
+            ArrayList arrayList = new ArrayList();
+            foreach(var r in routelist)
+            {
+                arrayList.Add(r.PermissionRoute);
+            }
             return Json(new
             {
                 data = new
                 {
-                    id = 1,
-                    name = "caty",
-                    permission = new Array[0],
-                    role = new string[1] { "admin" }
-                },
+                    id = result.FirstOrDefault().UserId,
+                    name = result.FirstOrDefault().UserName,
+                    route = arrayList,
+                    //route = new ArrayList{
+                    //   "admin","admin/index","record","record/index","role",
+                    //   "role/index","permission/index","charts","charts/index","category","category/address","category/error","category/solver"
+                    //},
+                    permission = apilist,
+                    //permission = new ArrayList
+                    //{
+                    //    new
+                    //    {
+                    //       route_match = "/api/dashboard"
+                    //    },
+                    //    new
+                    //    {
+                    //         route_match = "/api/admin"
+                    //    }
+                    //},
+                    role=new string[1] {result.FirstOrDefault().RoleName }
+                 },
                 status = "sucess",
                 status_code = "200"
             });
@@ -89,7 +143,7 @@ namespace IRS.Web.Controllers
             var claims = new[]
             {
                    new Claim(ClaimTypes.Name, request.Username)
-               };
+             };
             //sign the token using a secret key.This secret will be shared between your API and anything that needs to check that the token is legit.
             //Configuration = builder.Build();
             //var value = Configuration["Section:Key"];
