@@ -11,8 +11,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
-using Microsoft.Extensions.Configuration;
 using System.Collections;
+using Microsoft.Extensions.Configuration;
 
 namespace IRS.Web.Controllers
 {

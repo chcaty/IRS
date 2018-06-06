@@ -61,13 +61,13 @@
           <template slot-scope="scope">
             <div v-if="scope.row.faultResult != endFlag ">
               <el-tooltip content="编辑" placement="right-end">
-                <el-button size="small" plain icon="el-icon-edit-outline" @click="edit(scope.row)"></el-button>
+                <el-button size="mini" plain icon="el-icon-edit-outline" @click="edit(scope.row)"></el-button>
               </el-tooltip>
               <el-tooltip content="删除" placement="right-end">
-                <el-button plain icon="el-icon-delete" type="danger" size="small" @click="del(scope.row)"></el-button>
+                <el-button plain icon="el-icon-delete" type="danger" size="mini" @click="del(scope.row)"></el-button>
               </el-tooltip>
               <el-tooltip content="新增维修记录" placement="right-end">
-                <el-button plain icon="el-icon-edit" type="primary" size="small" @click="addprocess(scope.row)"></el-button>
+                <el-button plain icon="el-icon-edit" type="primary" size="mini" @click="addprocess(scope.row)"></el-button>
               </el-tooltip>
             </div>
           </template>
